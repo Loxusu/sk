@@ -22,7 +22,6 @@
             padding: 20px;
         }
 
-        /* 仿宋辅助说明 */
         .fangsong-note, .radar-title, .result-poem, .info-content, .footer-note {
             font-family: 'FangSong', '仿宋', 'STFangsong', serif;
         }
@@ -139,7 +138,6 @@
             font-size: 0.8rem;
         }
 
-        /* 结果卡片 */
         .result-card {
             background: #FFFCF5;
             border-radius: 40px;
@@ -204,7 +202,7 @@
             font-weight: bold;
             font-size: 0.8rem;
             color: #4F8A3E;
-            width: 85px;
+            width: 110px; /* 变长了 */
             flex-shrink: 0;
             font-family: 'Microsoft YaHei', '黑体', sans-serif;
         }
@@ -214,6 +212,8 @@
             line-height: 1.4;
             flex: 1;
             font-family: 'FangSong', '仿宋', 'STFangsong', serif;
+            word-break: break-word; /* 修复自动换行 */
+            white-space: pre-wrap;
         }
         .action-buttons {
             display: flex;
@@ -272,7 +272,6 @@
 </div>
 
 <script>
-    // ---------- 题库 ----------
     const QUESTIONS = [
         {
             text: "周末闲暇，你更愿意去哪里？",
@@ -378,7 +377,6 @@
         const values = ['creativity','social','perception','explore','tenacity'].map(k => Math.min(1, abilities[k] / maxScore));
         
         ctx.clearRect(0,0,size,size);
-        // 网格
         for (let i=1; i<=5; i++) {
             ctx.beginPath();
             let r = radius * i / 5;
@@ -393,7 +391,6 @@
             ctx.strokeStyle = "#DCCB9C";
             ctx.stroke();
         }
-        // 轴线
         for (let j=0; j<5; j++) {
             let angle = (j * 72 - 90) * Math.PI/180;
             let x = center + radius * Math.cos(angle);
@@ -404,7 +401,6 @@
             ctx.strokeStyle = "#C2A15B";
             ctx.stroke();
         }
-        // 数据区域
         ctx.beginPath();
         for (let j=0; j<5; j++) {
             let r2 = radius * values[j];
