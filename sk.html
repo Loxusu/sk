@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>四时雅集 · 君子电子手帐</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #E8E0CE;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Microsoft YaHei', '黑体', 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+        }
+
+        /* 仿宋辅助 */
+        .fangsong, .poem-area textarea, .sticker-bar .sticker, .journal-poem, .footer-note {
+            font-family: 'FangSong', '仿宋', 'STFangsong', serif;
+        }
+
+        .app-container {
+            max-width: 560px;
+            width: 100%;
+            background: #FDF9EF;
+            background-image: radial-gradient(circle at 10% 20%, rgba(170, 140, 90, 0.05) 2%, transparent 2.5%);
+            background-size: 28px 28px;
+            border-radius: 48px 32px 56px 32px;
+            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(255, 250, 230, 0.6);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        /* 头部 */
+        .header {
+            background: #4F8A3E;
+            padding: 18px 20px;
+            text-align: center;
+            color: white;
+        }
+        .header h1 {
+            font-size: 1.8rem;
+            letter-spacing: 3px;
+            font-weight: 600;
+        }
+        .header p {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            padding: 24px 20px 32px;
+        }
+
+        /* 四宫格网格 */
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .grid-card {
+            background: #FFFCF5;
+            border-radius: 32px;
+            padding: 20px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.15s;
+            border: 1px solid #EFE5CF;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+        .grid-card:active {
+            transform: scale(0.96);
+            background: #F9F3E3;
+        }
+        .card-emoji {
+            font-size: 3rem;
+            margin-bottom: 8px;
+        }
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        .card-sub {
+            font-size: 0.7rem;
+            color: #8F7A4B;
+            margin-top: 6px;
+        }
+
+        /* 手帐页面 */
+        .journal-page {
+            padding: 16px 20px 24px;
+        }
+        .back-btn {
+            background: #C2A15B;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            color: white;
+            font-family: inherit;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+        .journal-card {
+            background: #FFFCF5;
+            border-radius: 32px;
+            padding: 20px;
+            border: 1px solid #EFE5CF;
+        }
+        .identity-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #F9F3E3;
+            border-radius: 28px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            border-left: 6px solid;
+        }
+        .identity-emoji {
+            font-size: 2.2rem;
+        }
+        .identity-text h3 {
+            font-size: 1rem;
+        }
+        .identity-text p {
+            font-size: 0.7rem;
+            color: #8F7A4B;
+        }
+        .section-label {
+            font-size: 0.75rem;
+            color: #B1925C;
+            margin: 16px 0 8px;
+            border-left: 2px solid #C2A15B;
+            padding-left: 10px;
+        }
+        .photo-grid {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        .photo-card {
+            width: 90px;
+            height: 90px;
+            background: #F0E8D4;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            font-size: 2rem;
+            cursor: pointer;
+            border: 1px solid #E2D1B0;
+            position: relative;
+            overflow: hidden;
+        }
+        .photo-card span {
+            font-size: 0.6rem;
+            color: #6A4E2A;
+            background: rgba(255,255,240,0.8);
+            padding: 2px 6px;
+            border-radius: 20px;
+        }
+        .photo-card input {
+            display: none;
+        }
+        .photo-card.has-img {
+            background-size: cover;
+            background-position: center;
+        }
+        .photo-card.has-img span {
+            opacity: 0;
+        }
+        .add-btn {
+            background: #EFE5CF;
+            border: none;
+            border-radius: 40px;
+            padding: 6px 14px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            margin-bottom: 8px;
+        }
+        .poem-box {
+            background: #FDF5E6;
+            border-radius: 24px;
+            padding: 12px;
+            margin: 12px 0;
+            border: 1px dashed #C2A15B;
+        }
+        .poem-box textarea {
+            width: 100%;
+            border: none;
+            background: transparent;
+            font-size: 0.85rem;
+            resize: vertical;
+            outline: none;
+            min-height: 80px;
+        }
+        .sticker-bar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 12px 0;
+            border-top: 1px solid #EFE5CF;
+            padding-top: 16px;
+        }
+        .sticker {
+            font-size: 1.8rem;
+            cursor: pointer;
+            background: #F9F3E3;
+            padding: 6px;
+            border-radius: 24px;
+            transition: 0.1s;
+        }
+        .sticker:active {
+            transform: scale(0.9);
+        }
+        .sticker-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 50px;
+        }
+        .placed-sticker {
+            font-size: 1.6rem;
+            cursor: pointer;
+            margin: 2px;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 24px;
+        }
+        .btn-primary, .btn-secondary {
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-family: inherit;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .btn-primary {
+            background: #4F8A3E;
+            color: white;
+        }
+        .btn-secondary {
+            background: #C2A15B;
+            color: white;
+        }
+        .btn-primary:active, .btn-secondary:active {
+            transform: scale(0.96);
+        }
+        .footer-note {
+            text-align: center;
+            font-size: 0.6rem;
+            color: #CABE9C;
+            padding: 16px 20px 20px;
+            border-top: 1px solid #EFE2C3;
+        }
+        .hidden {
+            display: none;
+        }
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #3E2C1F;
+            color: #FFFAEC;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            opacity: 0;
+            transition: 0.2s;
+            pointer-events: none;
+            z-index: 200;
+        }
+    </style>
+</head>
+<body>
+<div class="app-container" id="app">
+    <div class="header">
+        <h1>四时雅集 · 录迹</h1>
+        <p>君子手帐 · 随心记录</p>
+    </div>
+    <div id="mainView">
+        <div class="main-content">
+            <div class="grid-4">
+                <div class="grid-card" data-junzi="me">
+                    <div class="card-emoji">🌸</div>
+                    <div class="card-title" style="color:#E6354D">梅使</div>
+                    <div class="card-sub">疏影横斜 · 踏雪寻芳</div>
+                </div>
+                <div class="grid-card" data-junzi="lan">
+                    <div class="card-emoji">🌿</div>
+                    <div class="card-title" style="color:#3A6B5E">兰客</div>
+                    <div class="card-sub">空谷幽兰 · 清逸脱俗</div>
+                </div>
+                <div class="grid-card" data-junzi="zhu">
+                    <div class="card-emoji">🎋</div>
+                    <div class="card-title" style="color:#4F8A3E">竹友</div>
+                    <div class="card-sub">虚怀若谷 · 坚韧谦逊</div>
+                </div>
+                <div class="grid-card" data-junzi="ju">
+                    <div class="card-emoji">🍂</div>
+                    <div class="card-title" style="color:#F0B847">菊隐</div>
+                    <div class="card-sub">东篱采菊 · 悠然南山</div>
+                </div>
+            </div>
+            <div class="footer-note">点击任一君子，记录你的雅集手帐</div>
+        </div>
+    </div>
+    <div id="journalView" class="hidden"></div>
+</div>
+<div id="toast" class="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+    // 君子数据配置
+    const JUNZI_CONFIG = {
+        me: {
+            name: "梅使",
+            emoji: "🌸",
+            title: "踏雪寻芳",
+            poem: "疏影横斜水清浅，暗香浮动月黄昏。",
+            color: "#E6354D",
+            defaultPoem: "疏影横斜水清浅，暗香浮动月黄昏。"
+        },
+        lan: {
+            name: "兰客",
+            emoji: "🌿",
+            title: "空谷幽兰",
+            poem: "幽兰在空谷，馥馥吐奇芳。",
+            color: "#3A6B5E",
+            defaultPoem: "幽兰在空谷，馥馥吐奇芳。"
+        },
+        zhu: {
+            name: "竹友",
+            emoji: "🎋",
+            title: "虚怀若谷",
+            poem: "未出土时先有节，便凌云去也无心。",
+            color: "#4F8A3E",
+            defaultPoem: "未出土时先有节，便凌云去也无心。"
+        },
+        ju: {
+            name: "菊隐",
+            emoji: "🍂",
+            title: "东篱采菊",
+            poem: "采菊东篱下，悠然见南山。",
+            color: "#F0B847",
+            defaultPoem: "采菊东篱下，悠然见南山。"
+        }
+    };
+
+    // 存储每个君子的手帐数据 (图片 base64、诗句、贴纸列表)
+    let journalData = {
+        me: { photos: [], poemText: "", stickers: [] },
+        lan: { photos: [], poemText: "", stickers: [] },
+        zhu: { photos: [], poemText: "", stickers: [] },
+        ju: { photos: [], poemText: "", stickers: [] }
+    };
+
+    // 当前打开的君子
+    let currentJunzi = null;
+
+    // 加载 localStorage 数据
+    function loadData() {
+        const saved = localStorage.getItem("fourSeasonsJournal");
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                for (let key of ['me','lan','zhu','ju']) {
+                    if (parsed[key]) {
+                        journalData[key] = parsed[key];
+                        // 确保结构完整
+                        if (!journalData[key].photos) journalData[key].photos = [];
+                        if (!journalData[key].stickers) journalData[key].stickers = [];
+                        if (journalData[key].poemText === undefined) journalData[key].poemText = JUNZI_CONFIG[key].defaultPoem;
+                    }
+                }
+            } catch(e) {}
+        }
+        // 初始化默认诗句
+        for (let key of ['me','lan','zhu','ju']) {
+            if (!journalData[key].poemText) journalData[key].poemText = JUNZI_CONFIG[key].defaultPoem;
+        }
+    }
+
+    function saveData() {
+        localStorage.setItem("fourSeasonsJournal", JSON.stringify(journalData));
+    }
+
+    // 显示手帐编辑页
+    function showJournal(junziKey) {
+        currentJunzi = junziKey;
+        const config = JUNZI_CONFIG[junziKey];
+        const data = journalData[junziKey];
+        
+        // 构建照片区
+        let photosHtml = '';
+        // 最多显示6张照片，这里用数组存储
+        const photoList = data.photos || [];
+        for (let i = 0; i < Math.max(photoList.length, 3); i++) {
+            if (i < photoList.length) {
+                photosHtml += `<div class="photo-card has-img" style="background-image: url('${photoList[i]}');"><span>📷</span><input type="file" accept="image/*" data-index="${i}"></div>`;
+            } else {
+                photosHtml += `<div class="photo-card"><span>➕ 添加</span><input type="file" accept="image/*" data-index="${i}"></div>`;
+            }
+        }
+        
+        const html = `
+            <div class="journal-page">
+                <button class="back-btn" id="backToGridBtn">← 返回四宫格</button>
+                <div class="journal-card" id="journalCard">
+                    <div class="identity-section" style="border-left-color: ${config.color}">
+                        <div class="identity-emoji">${config.emoji}</div>
+                        <div class="identity-text">
+                            <h3 style="color:${config.color}">${config.name} · ${config.title}</h3>
+                            <p>${config.poem}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="section-label">📷 我的留墨集</div>
+                    <div class="photo-grid" id="photoGrid">
+                        ${photosHtml}
+                    </div>
+                    <button class="add-btn" id="addPhotoBtn">+ 添加照片</button>
+                    
+                    <div class="section-label">✍️ 我的雅集诗笺</div>
+                    <div class="poem-box">
+                        <textarea id="poemInput" placeholder="写一句诗，或记录今日心情……">${escapeHtml(data.poemText)}</textarea>
+                    </div>
+                    
+                    <div class="section-label">🏷️ 君子贴纸</div>
+                    <div class="sticker-bar">
+                        <span class="sticker">🌸</span><span class="sticker">🌿</span><span class="sticker">🎋</span><span class="sticker">🍂</span>
+                        <span class="sticker">🖌️</span><span class="sticker">🍵</span><span class="sticker">📜</span><span class="sticker">🏮</span>
+                        <span class="sticker">✨</span><span class="sticker">🍃</span>
+                    </div>
+                    <div class="sticker-container" id="stickerContainer">
+                        ${(data.stickers || []).map(s => `<span class="placed-sticker" data-sticker="${escapeAttr(s)}">${s}</span>`).join('')}
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn-secondary" id="shareJournalBtn">📤 分享手帐</button>
+                        <button class="btn-primary" id="saveJournalBtn">💾 保存手帐</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('mainView').classList.add('hidden');
+        const journalView = document.getElementById('journalView');
+        journalView.innerHTML = html;
+        journalView.classList.remove('hidden');
+        
+        // 绑定事件
+        document.getElementById('backToGridBtn').addEventListener('click', () => {
+            // 保存当前编辑内容
+            saveCurrentJournal();
+            journalView.classList.add('hidden');
+            document.getElementById('mainView').classList.remove('hidden');
+        });
+        
+        // 照片上传逻辑
+        setupPhotoUploads();
+        // 添加照片按钮
+        document.getElementById('addPhotoBtn').addEventListener('click', () => addNewPhoto());
+        // 诗句保存实时监听
+        const poemTextarea = document.getElementById('poemInput');
+        poemTextarea.addEventListener('input', () => {
+            journalData[currentJunzi].poemText = poemTextarea.value;
+            saveData();
+        });
+        // 贴纸添加
+        const stickerItems = document.querySelectorAll('.sticker');
+        stickerItems.forEach(st => {
+            st.addEventListener('click', () => {
+                const newSticker = document.createElement('span');
+                newSticker.innerText = st.innerText;
+                newSticker.className = 'placed-sticker';
+                newSticker.style.fontSize = '1.6rem';
+                newSticker.style.margin = '4px';
+                newSticker.style.cursor = 'pointer';
+                newSticker.addEventListener('click', () => {
+                    newSticker.remove();
+                    // 更新存储的贴纸列表
+                    const container = document.getElementById('stickerContainer');
+                    const stickers = Array.from(container.querySelectorAll('.placed-sticker')).map(s => s.innerText);
+                    journalData[currentJunzi].stickers = stickers;
+                    saveData();
+                });
+                document.getElementById('stickerContainer').appendChild(newSticker);
+                // 更新存储
+                const container = document.getElementById('stickerContainer');
+                const stickers = Array.from(container.querySelectorAll('.placed-sticker')).map(s => s.innerText);
+                journalData[currentJunzi].stickers = stickers;
+                saveData();
+                showToast(`添加了贴纸 ${st.innerText}`);
+            });
+        });
+        
+        // 保存手帐为图片
+        document.getElementById('saveJournalBtn').addEventListener('click', () => saveJournalAsImage());
+        // 分享手帐
+        document.getElementById('shareJournalBtn').addEventListener('click', () => shareJournal());
+    }
+    
+    function setupPhotoUploads() {
+        const photoCards = document.querySelectorAll('.photo-card');
+        photoCards.forEach((card, idx) => {
+            const input = card.querySelector('input');
+            if (!input) return;
+            // 移除旧的监听器，重新绑定
+            const newInput = input.cloneNode(true);
+            input.parentNode.replaceChild(newInput, input);
+            newInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        const imgData = ev.target.result;
+                        // 更新照片数组
+                        let photos = journalData[currentJunzi].photos || [];
+                        const index = parseInt(newInput.getAttribute('data-index'));
+                        if (!isNaN(index) && index < photos.length) {
+                            photos[index] = imgData;
+                        } else {
+                            // 新添加的情况
+                            if (photos.length <= index) photos.push(imgData);
+                            else photos[index] = imgData;
+                        }
+                        journalData[currentJunzi].photos = photos;
+                        saveData();
+                        // 刷新当前页面以显示新图片
+                        showJournal(currentJunzi);
+                        showToast('照片已添加');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            // 点击卡片触发文件选择
+            const clickHandler = () => newInput.click();
+            card.removeEventListener('click', clickHandler);
+            card.addEventListener('click', clickHandler);
+        });
+    }
+    
+    function addNewPhoto() {
+        let photos = journalData[currentJunzi].photos || [];
+        photos.push(null); // 占位
+        journalData[currentJunzi].photos = photos;
+        saveData();
+        showJournal(currentJunzi);
+        showToast('点击空白卡片添加照片');
+    }
+    
+    function saveCurrentJournal() {
+        // 诗句已经在 input 事件中保存，贴纸也在添加/删除时保存，照片在添加时保存
+        // 但为了安全，再手动同步一次
+        const poemTextarea = document.getElementById('poemInput');
+        if (poemTextarea) {
+            journalData[currentJunzi].poemText = poemTextarea.value;
+        }
+        // 贴纸从 DOM 同步
+        const container = document.getElementById('stickerContainer');
+        if (container) {
+            const stickers = Array.from(container.querySelectorAll('.placed-sticker')).map(s => s.innerText);
+            journalData[currentJunzi].stickers = stickers;
+        }
+        saveData();
+    }
+    
+    async function saveJournalAsImage() {
+        const journalCard = document.querySelector('.journal-card');
+        if (!journalCard) return;
+        showToast('正在生成图片...');
+        try {
+            const canvas = await html2canvas(journalCard, {
+                scale: 2.5,
+                backgroundColor: '#FFFCF5',
+                logging: false,
+                useCORS: true
+            });
+            const link = document.createElement('a');
+            link.download = `four_seasons_${currentJunzi}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+            showToast('✨ 手帐已保存至相册');
+        } catch(e) {
+            showToast('保存失败，可尝试截图');
+        }
+    }
+    
+    async function shareJournal() {
+        const journalCard = document.querySelector('.journal-card');
+        if (!journalCard) return;
+        showToast('准备分享...');
+        try {
+            const canvas = await html2canvas(journalCard, { scale: 2, backgroundColor: '#FFFCF5' });
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+            const file = new File([blob], `journal_${currentJunzi}.png`, { type: 'image/png' });
+            if (navigator.share) {
+                await navigator.share({
+                    title: '四时雅集·君子手帐',
+                    text: `我在「四时雅集」的${JUNZI_CONFIG[currentJunzi].name}手帐`,
+                    files: [file]
+                });
+                showToast('分享成功');
+            } else {
+                // 降级：提示保存
+                showToast('当前浏览器不支持分享，已保存图片至相册');
+                const link = document.createElement('a');
+                link.download = `journal_${currentJunzi}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            }
+        } catch(e) {
+            showToast('分享取消或失败');
+        }
+    }
+    
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.innerText = msg;
+        toast.style.opacity = '1';
+        setTimeout(() => {
+            toast.style.opacity = '0';
+        }, 2000);
+    }
+    
+    function escapeHtml(str) {
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    function escapeAttr(str) {
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    
+    // 初始化
+    loadData();
+    // 绑定四宫格点击事件
+    const cards = document.querySelectorAll('.grid-card');
+    cards.forEach(card => {
+        card.addEventListener('click', (e) => {
+            const junzi = card.getAttribute('data-junzi');
+            if (junzi) showJournal(junzi);
+        });
+    });
+</script>
+</body>
+</html>

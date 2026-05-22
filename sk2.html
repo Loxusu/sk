@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>君子人格测试 · 四时雅集</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #E8E0CE;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Microsoft YaHei', '黑体', 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+        }
+
+        /* 仿宋辅助说明 */
+        .fangsong-note, .radar-title, .result-poem, .info-content, .footer-note {
+            font-family: 'FangSong', '仿宋', 'STFangsong', serif;
+        }
+
+        .test-container {
+            max-width: 560px;
+            width: 100%;
+            background: #FDF9EF;
+            background-image: radial-gradient(circle at 10% 20%, rgba(170, 140, 90, 0.05) 2%, transparent 2.5%);
+            background-size: 28px 28px;
+            border-radius: 48px 32px 56px 32px;
+            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(255, 250, 230, 0.6);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #4F8A3E;
+            padding: 20px 20px 16px;
+            text-align: center;
+            color: white;
+            font-family: 'Microsoft YaHei', '黑体', sans-serif;
+        }
+        .header h1 {
+            font-size: 1.9rem;
+            letter-spacing: 4px;
+            font-weight: 600;
+            border-bottom: 2px solid #F0B847;
+            display: inline-block;
+            padding-bottom: 6px;
+            margin-bottom: 8px;
+        }
+        .header p {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .progress-area {
+            padding: 16px 24px 0;
+        }
+        .progress-text {
+            font-size: 0.7rem;
+            color: #B1925C;
+            text-align: right;
+            margin-bottom: 6px;
+            font-family: 'Microsoft YaHei', '黑体', sans-serif;
+        }
+        .progress-bar-bg {
+            background: #E7DCC0;
+            border-radius: 20px;
+            height: 6px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: #4F8A3E;
+            width: 0%;
+            height: 100%;
+            border-radius: 20px;
+            transition: width 0.25s ease;
+        }
+
+        .dynamic-area {
+            padding: 20px 24px 32px;
+        }
+
+        .question-card {
+            background: #FFFCF5;
+            border-radius: 32px;
+            padding: 24px 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            border: 1px solid #EFE5CF;
+        }
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #4F3A28;
+            margin-bottom: 24px;
+            padding-left: 10px;
+            border-left: 4px solid #C2A15B;
+            font-family: 'Microsoft YaHei', '黑体', sans-serif;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .option-btn {
+            background: #F9F3E3;
+            border: 1px solid #E2D2B0;
+            border-radius: 60px;
+            padding: 12px 18px;
+            font-size: 0.95rem;
+            font-family: 'Microsoft YaHei', '黑体', sans-serif;
+            color: #4B3822;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .option-btn:active {
+            background: #EFE5CF;
+            transform: translateX(4px);
+        }
+        .option-prefix {
+            font-weight: bold;
+            background: #EADDBD;
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 40px;
+            font-size: 0.8rem;
+        }
+
+        /* 结果卡片 */
+        .result-card {
+            background: #FFFCF5;
+            border-radius: 40px;
+            padding: 20px 20px 28px;
+            border: 1px solid #ECD9A8;
+        }
+        .result-emoji {
+            font-size: 4rem;
+            text-align: center;
+            margin: 8px 0 4px;
+        }
+        .result-name {
+            text-align: center;
+            font-size: 1.9rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            font-family: 'Microsoft YaHei', '黑体', sans-serif;
+        }
+        .result-poem {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #8F7A4B;
+            background: #FDF5E6;
+            display: inline-block;
+            width: auto;
+            margin: 8px auto;
+            padding: 4px 16px;
+            border-radius: 40px;
+        }
+        .radar-container {
+            margin: 20px 0 16px;
+            background: #F9F5EA;
+            border-radius: 28px;
+            padding: 12px;
+            text-align: center;
+        }
+        canvas {
+            display: block;
+            width: 260px;
+            height: 260px;
+            margin: 0 auto;
+            background: #FFFCF5;
+            border-radius: 20px;
+        }
+        .radar-title {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #B1925C;
+            margin-top: 8px;
+        }
+        .info-grid {
+            margin: 16px 0 8px;
+            border-top: 1px solid #EFE5CF;
+            padding-top: 14px;
+        }
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 14px;
+        }
+        .info-label {
+            font-weight: bold;
+            font-size: 0.8rem;
+            color: #4F8A3E;
+            width: 85px;
+            flex-shrink: 0;
+            font-family: 'Microsoft YaHei', '黑体', sans-serif;
+        }
+        .info-content {
+            font-size: 0.8rem;
+            color: #5C4A2E;
+            line-height: 1.4;
+            flex: 1;
+            font-family: 'FangSong', '仿宋', 'STFangsong', serif;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 20px;
+        }
+        .reset-btn, .share-btn {
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-family: 'Microsoft YaHei', '黑体', sans-serif;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .reset-btn {
+            background: #C2A15B;
+            color: white;
+        }
+        .share-btn {
+            background: #4F8A3E;
+            color: white;
+        }
+        .reset-btn:active, .share-btn:active {
+            transform: scale(0.96);
+        }
+        .hidden {
+            display: none;
+        }
+        footer {
+            text-align: center;
+            font-size: 0.6rem;
+            color: #CABE9C;
+            padding: 16px 20px 20px;
+            border-top: 1px solid #EFE2C3;
+            font-family: 'FangSong', '仿宋', serif;
+        }
+        button {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="test-container">
+    <div class="header">
+        <h1>君子·人格测试</h1>
+        <p>四时雅集 · 姑苏纹章</p>
+    </div>
+    <div class="progress-area">
+        <div class="progress-text" id="progressText">第1 / 5题</div>
+        <div class="progress-bar-bg"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+    <div class="dynamic-area" id="dynamicContent"></div>
+    <footer class="footer-note">梅之坚韧 · 兰之幽雅 · 竹之谦逊 · 菊之淡泊</footer>
+</div>
+
+<script>
+    // ---------- 题库 ----------
+    const QUESTIONS = [
+        {
+            text: "周末闲暇，你更愿意去哪里？",
+            options: [
+                { label: "去山野寻梅，写生吟诗", value: "me", abilities: { creativity: 4, social: 1, perception: 3, explore: 3, tenacity: 4 } },
+                { label: "幽静茶室，赏兰品茗", value: "lan", abilities: { creativity: 2, social: 2, perception: 5, explore: 1, tenacity: 2 } },
+                { label: "竹林深处，手作工坊", value: "zhu", abilities: { creativity: 3, social: 1, perception: 4, explore: 2, tenacity: 4 } },
+                { label: "东篱田园，染布种菊", value: "ju", abilities: { creativity: 4, social: 1, perception: 3, explore: 2, tenacity: 3 } }
+            ]
+        },
+        {
+            text: "你更欣赏哪种交友方式？",
+            options: [
+                { label: "以诗会友，志同道合", value: "me", abilities: { creativity: 4, social: 3, perception: 2, explore: 2, tenacity: 3 } },
+                { label: "君子之交，清淡如水", value: "lan", abilities: { creativity: 2, social: 2, perception: 4, explore: 1, tenacity: 2 } },
+                { label: "切磋技艺，共同成长", value: "zhu", abilities: { creativity: 3, social: 3, perception: 2, explore: 2, tenacity: 4 } },
+                { label: "随缘而聚，自在闲谈", value: "ju", abilities: { creativity: 2, social: 2, perception: 3, explore: 1, tenacity: 3 } }
+            ]
+        },
+        {
+            text: "面对困难时，你通常会？",
+            options: [
+                { label: "傲雪凌霜，坚持到底", value: "me", abilities: { creativity: 2, social: 1, perception: 2, explore: 2, tenacity: 5 } },
+                { label: "冷静自持，从容应对", value: "lan", abilities: { creativity: 2, social: 2, perception: 4, explore: 1, tenacity: 3 } },
+                { label: "虚心求教，柔韧不折", value: "zhu", abilities: { creativity: 3, social: 2, perception: 3, explore: 2, tenacity: 4 } },
+                { label: "顺其自然，随遇而安", value: "ju", abilities: { creativity: 3, social: 1, perception: 3, explore: 1, tenacity: 3 } }
+            ]
+        },
+        {
+            text: "哪种艺术形式最能打动你？",
+            options: [
+                { label: "书法 / 水墨画", value: "me", abilities: { creativity: 5, social: 1, perception: 4, explore: 2, tenacity: 3 } },
+                { label: "古琴 / 茶道", value: "lan", abilities: { creativity: 3, social: 2, perception: 5, explore: 1, tenacity: 2 } },
+                { label: "竹编 / 园艺", value: "zhu", abilities: { creativity: 4, social: 1, perception: 3, explore: 3, tenacity: 4 } },
+                { label: "草木染 / 陶艺", value: "ju", abilities: { creativity: 4, social: 1, perception: 3, explore: 2, tenacity: 3 } }
+            ]
+        },
+        {
+            text: "你更向往哪种人生境界？",
+            options: [
+                { label: "凌寒独开，香自苦寒", value: "me", abilities: { creativity: 3, social: 2, perception: 2, explore: 3, tenacity: 5 } },
+                { label: "空谷幽兰，无人自芳", value: "lan", abilities: { creativity: 3, social: 1, perception: 5, explore: 2, tenacity: 2 } },
+                { label: "虚怀若谷，坚韧不拔", value: "zhu", abilities: { creativity: 3, social: 2, perception: 3, explore: 3, tenacity: 4 } },
+                { label: "采菊东篱，悠然南山", value: "ju", abilities: { creativity: 4, social: 2, perception: 4, explore: 2, tenacity: 3 } }
+            ]
+        }
+    ];
+
+    const GENTLEMAN_INFO = {
+        me: { name: "梅使", emoji: "🌸", poem: "疏影横斜水清浅，暗香浮动月黄昏。", color: "#E6354D",
+              personality: "坚韧高洁，不畏逆境，有着极强的意志力与艺术表现欲。",
+              coreTrait: "傲骨·创造力·领袖气质", socialMode: "以才华为纽带，吸引志同道合者，但略显孤高。",
+              hiddenPotential: "在危机中能爆发出惊人的领导力与创新解决方案。" },
+        lan: { name: "兰客", emoji: "🌿", poem: "幽兰在空谷，馥馥吐奇芳。", color: "#3A6B5E",
+              personality: "清雅脱俗，善于洞察人心，追求精神世界的丰盈。",
+              coreTrait: "敏锐·感知力·优雅品味", socialMode: "少而精的社交，深度交流，不喜喧嚣。",
+              hiddenPotential: "能在复杂环境中捕捉到被忽略的美学与商业机会。" },
+        zhu: { name: "竹友", emoji: "🎋", poem: "未出土时先有节，便凌云去也无心。", color: "#4F8A3E",
+              personality: "谦逊正直，柔韧顽强，实践中不断成长。",
+              coreTrait: "坚韧·实干·学习力", socialMode: "乐于分享技艺，与同好共建社群。",
+              hiddenPotential: "跨界整合资源，从手作中发展出可持续的创意事业。" },
+        ju: { name: "菊隐", emoji: "🍂", poem: "采菊东篱下，悠然见南山。", color: "#F0B847",
+              personality: "淡泊宁静，热爱自然，享受慢生活的治愈力。",
+              coreTrait: "平和·感知力·生活美学家", socialMode: "随缘而聚，在自在氛围中建立信任。",
+              hiddenPotential: "将传统手工艺与现代生活方式结合，打造治愈系品牌。" }
+    };
+
+    let currentStep = 0, answers = [], abilityScores = { creativity:0, social:0, perception:0, explore:0, tenacity:0 }, testFinished = false;
+    const dynamicContainer = document.getElementById('dynamicContent');
+    const progressText = document.getElementById('progressText');
+    const progressFill = document.getElementById('progressFill');
+
+    function updateProgress() {
+        let percent = testFinished ? 100 : (currentStep / QUESTIONS.length) * 100;
+        progressFill.style.width = `${percent}%`;
+        progressText.innerText = testFinished ? `已完成 · 君子鉴定` : `第${currentStep+1} / ${QUESTIONS.length}题`;
+    }
+
+    function computeIdentity() {
+        let score = { me:0, lan:0, zhu:0, ju:0 };
+        answers.forEach(v => score[v]++);
+        let maxVal = -1, result = 'me';
+        for (let k of ['me','lan','zhu','ju']) {
+            if (score[k] > maxVal) { maxVal = score[k]; result = k; }
+            else if (score[k] === maxVal && maxVal !== -1) {
+                let ties = ['me','lan','zhu','ju'].filter(kk => score[kk] === maxVal);
+                result = ties[Math.floor(Math.random() * ties.length)];
+            }
+        }
+        return result;
+    }
+
+    function drawRadar(abilities) {
+        const canvas = document.getElementById('radarCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const size = 400;
+        canvas.width = size; canvas.height = size;
+        canvas.style.width = '260px'; canvas.style.height = '260px';
+        const center = size/2, radius = 150;
+        const axes = ['创造力', '社交力', '感知力', '探索力', '坚韧力'];
+        const maxScore = 25;
+        const values = ['creativity','social','perception','explore','tenacity'].map(k => Math.min(1, abilities[k] / maxScore));
+        
+        ctx.clearRect(0,0,size,size);
+        // 网格
+        for (let i=1; i<=5; i++) {
+            ctx.beginPath();
+            let r = radius * i / 5;
+            for (let j=0; j<5; j++) {
+                let angle = (j * 72 - 90) * Math.PI/180;
+                let x = center + r * Math.cos(angle);
+                let y = center + r * Math.sin(angle);
+                if (j===0) ctx.moveTo(x,y);
+                else ctx.lineTo(x,y);
+            }
+            ctx.closePath();
+            ctx.strokeStyle = "#DCCB9C";
+            ctx.stroke();
+        }
+        // 轴线
+        for (let j=0; j<5; j++) {
+            let angle = (j * 72 - 90) * Math.PI/180;
+            let x = center + radius * Math.cos(angle);
+            let y = center + radius * Math.sin(angle);
+            ctx.beginPath();
+            ctx.moveTo(center,center);
+            ctx.lineTo(x,y);
+            ctx.strokeStyle = "#C2A15B";
+            ctx.stroke();
+        }
+        // 数据区域
+        ctx.beginPath();
+        for (let j=0; j<5; j++) {
+            let r2 = radius * values[j];
+            let angle = (j * 72 - 90) * Math.PI/180;
+            let x = center + r2 * Math.cos(angle);
+            let y = center + r2 * Math.sin(angle);
+            if (j===0) ctx.moveTo(x,y);
+            else ctx.lineTo(x,y);
+        }
+        ctx.closePath();
+        ctx.fillStyle = "rgba(79,138,62,0.3)";
+        ctx.fill();
+        ctx.strokeStyle = "#4F8A3E";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.font = "16px 'FangSong', '仿宋'";
+        ctx.fillStyle = "#5C4A2E";
+        for (let j=0; j<5; j++) {
+            let angle = (j * 72 - 90) * Math.PI/180;
+            let x = center + (radius + 20) * Math.cos(angle);
+            let y = center + (radius + 15) * Math.sin(angle);
+            ctx.fillText(axes[j], x-12, y+6);
+        }
+    }
+
+    function renderResult() {
+        testFinished = true;
+        const key = computeIdentity();
+        const info = GENTLEMAN_INFO[key];
+        const final = {
+            creativity: Math.min(25, abilityScores.creativity),
+            social: Math.min(25, abilityScores.social),
+            perception: Math.min(25, abilityScores.perception),
+            explore: Math.min(25, abilityScores.explore),
+            tenacity: Math.min(25, abilityScores.tenacity)
+        };
+        const html = `
+            <div class="result-card">
+                <div class="result-emoji">${info.emoji}</div>
+                <div class="result-name" style="color:${info.color}">${info.name}</div>
+                <div style="text-align:center;"><span class="result-poem fangsong-note">「 ${info.poem} 」</span></div>
+                <div class="radar-container">
+                    <canvas id="radarCanvas" width="400" height="400"></canvas>
+                    <div class="radar-title fangsong-note">☆ 君子五力图谱 ☆</div>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item"><div class="info-label">🧠性格解码</div><div class="info-content">${info.personality}</div></div>
+                    <div class="info-item"><div class="info-label">✨核心特质</div><div class="info-content">${info.coreTrait}</div></div>
+                    <div class="info-item"><div class="info-label">👥社交模式</div><div class="info-content">${info.socialMode}</div></div>
+                    <div class="info-item"><div class="info-label">🌱隐藏潜力</div><div class="info-content">${info.hiddenPotential}</div></div>
+                </div>
+                <div class="action-buttons">
+                    <button class="reset-btn" id="resetTestBtn">重新测试</button>
+                    <button class="share-btn" id="shareResultBtn">分享君子签</button>
+                </div>
+            </div>
+        `;
+        dynamicContainer.innerHTML = html;
+        drawRadar(final);
+        document.getElementById('resetTestBtn').onclick = () => resetTest();
+        document.getElementById('shareResultBtn').onclick = () => {
+            const text = `我在「四时雅集」君子测试中获得「${info.name}」身份。\n${info.poem}\n五力图谱：创造力${final.creativity} 社交力${final.social} 感知力${final.perception} 探索力${final.explore} 坚韧力${final.tenacity}\n测测你的君子人格！`;
+            if (navigator.share) navigator.share({ title: '君子人格测试', text: text }).catch(()=>alert(text));
+            else alert(text);
+        };
+        updateProgress();
+    }
+
+    function handleOptionSelect(opt) {
+        if (testFinished) return;
+        answers.push(opt.value);
+        abilityScores.creativity += opt.abilities.creativity;
+        abilityScores.social += opt.abilities.social;
+        abilityScores.perception += opt.abilities.perception;
+        abilityScores.explore += opt.abilities.explore;
+        abilityScores.tenacity += opt.abilities.tenacity;
+        if (currentStep + 1 >= QUESTIONS.length) renderResult();
+        else { currentStep++; renderCurrentQuestion(); updateProgress(); }
+    }
+
+    function renderCurrentQuestion() {
+        if (testFinished) return;
+        const q = QUESTIONS[currentStep];
+        let optsHtml = '';
+        const letters = ['A','B','C','D'];
+        q.options.forEach((opt, idx) => {
+            optsHtml += `<div class="option-btn" data-opt='${JSON.stringify(opt)}'><span class="option-prefix">${letters[idx]}</span><span>${opt.label}</span></div>`;
+        });
+        dynamicContainer.innerHTML = `<div class="question-card"><div class="question-text">${q.text}</div><div class="options">${optsHtml}</div></div>`;
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.addEventListener('click', () => handleOptionSelect(JSON.parse(btn.getAttribute('data-opt'))));
+        });
+    }
+
+    function resetTest() {
+        currentStep = 0;
+        answers = [];
+        abilityScores = { creativity:0, social:0, perception:0, explore:0, tenacity:0 };
+        testFinished = false;
+        renderCurrentQuestion();
+        updateProgress();
+    }
+
+    renderCurrentQuestion();
+    updateProgress();
+</script>
+</body>
+</html>
